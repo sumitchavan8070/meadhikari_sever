@@ -84,24 +84,24 @@ app.use(
 //   require("./routes/questionPaperRoutes")
 // );
 
-// app.use("/api/v1/auth/subjects", require("./routes/subjectRoutes")); // Include subject routes
+app.use("/api/v1/auth/subjects", require("./routes/subjectRoutes")); // Include subject routes
 
-// app.use("/api/v1/auth/groups", require("./routes/groupRoutes"));
+app.use("/api/v1/auth/groups", require("./routes/groupRoutes"));
 
 // //leaderboard
 // app.use("/api/v1/auth/leaderboard", require("./routes/leaderboardRoutes"));
 
-// app.use("/api/v1/auth/customtest", require("./routes/customTestRoutes"));
+app.use("/api/v1/auth/customtest", require("./routes/customTestRoutes"));
 
-// app.use("/api/v1/auth/papers", require("./routes/allPaperRoutes"));
+app.use("/api/v1/auth/papers", require("./routes/allPaperRoutes"));
 // app.use("/api/v1/admin/papers", require("./routes/allPaperRoutes"));
 
-// app.use("/api/v1/auth/feedback", require("./routes/feedbackRoutes"));
+app.use("/api/v1/auth/feedback", require("./routes/feedbackRoutes"));
 // app.use("/api/v1/admin/feedback", require("./routes/feedbackRoutes"));
 
-// app.use("/api/v1/auth/abc", require("./routes/examDetailWithYearRoute"));
+app.use("/api/v1/auth/abc", require("./routes/examDetailWithYearRoute"));
 
-// app.use("/api/v1/auth/subscription", require("./routes/subscriptionRoutes"));
+app.use("/api/v1/auth/subscription", require("./routes/subscriptionRoutes"));
 
 // Cron Job to Check Subscriptions
 // cron.schedule("17 20 * * *", async () => {
