@@ -67,18 +67,18 @@ app.use("/api/v1/auth/variable", require("./routes/constantsRoutes"));
 // app.use("/api/v1/admin/donation", require("./routes/donationRoutes"));
 app.use("/api/v1/auth/donation", require("./routes/donationRoutes"));
 
-// app.use("/api/v1/auth/posts", require("./routes/postRoutes"));
+app.use("/api/v1/auth/posts", require("./routes/postRoutes"));
 // app.use("/api/v1/admin/posts", require("./routes/postRoutes"));
 
-// app.use("/api/v1/auth/exam-categories", require("./routes/examCategoryRoutes")); //DONE
-// app.use("/api/v1/auth/subcategories", require("./routes/subExamTypeRoutes")); // Done
+app.use("/api/v1/auth/exam-categories", require("./routes/examCategoryRoutes")); //DONE
+app.use("/api/v1/auth/subcategories", require("./routes/subExamTypeRoutes")); // Done
 // app.use("/api/v1/admin/subcategories", require("./routes/subExamTypeRoutes")); // Done
 
-// app.use("/api/v1/auth/years", require("./routes/examYearRoutes")); // Done , for frontend
-// app.use(
-//   "/api/v1/auth/question-papers",
-//   require("./routes/questionPaperRoutes")
-// );
+app.use("/api/v1/auth/years", require("./routes/examYearRoutes")); // Done , for frontend
+app.use(
+  "/api/v1/auth/question-papers",
+  require("./routes/questionPaperRoutes")
+);
 // app.use(
 //   "/api/v1/admin/question-papers",
 //   require("./routes/questionPaperRoutes")
