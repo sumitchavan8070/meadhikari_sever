@@ -100,6 +100,20 @@ const {
 
 const feedbackController = require("../controllers/feedbackController");
 
+const {
+  createPaper,
+  getAllPapers,
+  getPaperByCategory,
+} = require("../controllers/allPaperController");
+
+// Create a new paper
+router.post("/papers/", createPaper);
+
+// Get all papers
+router.get("/papers/", getAllPapers);
+
+router.get("/papers/:categoryId", getPaperByCategory);
+
 // Create a new feedback entry
 router.post("/feedback/create", feedbackController.createFeedback);
 

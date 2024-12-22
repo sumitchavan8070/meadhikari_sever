@@ -75,9 +75,6 @@ app.use("/api/v1/auth/groups", require("./routes/groupRoutes"));
 
 app.use("/api/v1/auth/customtest", require("./routes/customTestRoutes"));
 
-app.use("/api/v1/auth/papers", require("./routes/allPaperRoutes"));
-app.use("/api/v1/admin/papers", require("./routes/allPaperRoutes"));
-
 //port
 const PORT = process.env.PORT || 8080;
 
