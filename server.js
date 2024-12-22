@@ -53,11 +53,26 @@ app.get("/", (req, res) => {
 chatSocket(io);
 
 //custome route
-app.use("/api/v1/auth", require("./routes/examplefirstRoute"));
-app.use("/api/v1/admin", require("./routes/examplesecoundRoute"));
+app.use("/api/v1/auth", require("./routes/userRoutes"));
+// app.use("/api/v1/auth/coupons", require("./routes/couponRoutes"));
+// app.use("/api/v1/admin/coupons", require("./routes/couponRoutes"));
+
+// app.use("/api/v1/admin", require("./routes/adminRoutes"));
+// app.use("/api/v1/auth/variable", require("./routes/constantsRoutes"));
+
+// app.use("/api/v1/auth/policy", require("./routes/privacyPolicyRoute"));
+// app.use("/api/v1/auth/deleteaccount", require("./routes/deletionRoutes"));
+
+// app.use("/api/v1/admin", require("./routes/studentsTableBackedRoute"));
+// app.use("/api/v1/admin/donation", require("./routes/donationRoutes"));
+// app.use("/api/v1/auth/donation", require("./routes/donationRoutes"));
 
 // app.use("/api/v1/auth/posts", require("./routes/postRoutes"));
 // app.use("/api/v1/admin/posts", require("./routes/postRoutes"));
+
+// app.use("/api/v1/auth/exam-categories", require("./routes/examCategoryRoutes")); //DONE
+// app.use("/api/v1/auth/subcategories", require("./routes/subExamTypeRoutes")); // Done
+// app.use("/api/v1/admin/subcategories", require("./routes/subExamTypeRoutes")); // Done
 
 // app.use("/api/v1/auth/years", require("./routes/examYearRoutes")); // Done , for frontend
 // app.use(
@@ -73,11 +88,64 @@ app.use("/api/v1/admin", require("./routes/examplesecoundRoute"));
 
 // app.use("/api/v1/auth/groups", require("./routes/groupRoutes"));
 
+// //leaderboard
+// app.use("/api/v1/auth/leaderboard", require("./routes/leaderboardRoutes"));
+
 // app.use("/api/v1/auth/customtest", require("./routes/customTestRoutes"));
+
+// app.use("/api/v1/auth/papers", require("./routes/allPaperRoutes"));
+// app.use("/api/v1/admin/papers", require("./routes/allPaperRoutes"));
+
+// app.use("/api/v1/auth/feedback", require("./routes/feedbackRoutes"));
+// app.use("/api/v1/admin/feedback", require("./routes/feedbackRoutes"));
+
+// app.use("/api/v1/auth/abc", require("./routes/examDetailWithYearRoute"));
+
+// app.use("/api/v1/auth/subscription", require("./routes/subscriptionRoutes"));
+
+// Cron Job to Check Subscriptions
+// cron.schedule("17 20 * * *", async () => {
+//   console.log("Running the subscription check");
+
+//   try {
+//     const currentDate = new Date();
+//     console.log(currentDate);
+
+//     const usersToUpdate = await userModel.find({
+//       subscriptionExpiryDate: { $lt: currentDate },
+//       isSubscriptionActive: true,
+//     });
+
+//     usersToUpdate.forEach(async (user) => {
+//       user.isSubscriptionActive = false;
+//       await user.save();
+//     });
+
+//     console.log(
+//       `${usersToUpdate.length} users had their subscriptions marked inactive.`
+//     );
+//   } catch (error) {
+//     console.error("Error checking subscription status:", error);
+//   }
+// });
 
 //port
 const PORT = process.env.PORT || 8080;
 
+//listen
+// app.listen(PORT, () => {
+//   console.log(`Server is Running ${PORT}`.bgGreen.white);
+// });
+
 server.listen(PORT, () => {
   console.log(`Server is Running ${PORT}`.bgGreen.white);
 });
+
+// server added to vercel
+
+// app.get("/", (req, res) => {
+//   res.send("Server is running!");
+//   console.log("Root path accessed. Server is running.".bgGreen.white);
+// });
+
+// setInterval(() => {}, 1000 * 60 * 60); // 1-hour interval to keep the worker running
