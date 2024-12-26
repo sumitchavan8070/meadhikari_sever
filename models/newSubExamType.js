@@ -11,6 +11,9 @@ const subExamTypeSchema = new mongoose.Schema({
     ref: "ExamCategory",
     required: true,
   },
+  questionPaperName: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("SubExamType", subExamTypeSchema);

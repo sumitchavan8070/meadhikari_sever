@@ -83,6 +83,14 @@ const getPaperByCategory = async (req, res) => {
       });
 
       // Push the questions to the questionPapers array
+      // questionPapers.push({
+      //   catID: categoryId,
+      //   subCatId: subCatId,
+      //   yearId: yearId,
+      //   QPYear: subcatAndYear.QPYear,
+      //   subCatName: subCategory ? subCategory.subCatName : "Unknown",
+      //   questions: questions,
+      // });
       questionPapers.push({
         catID: categoryId,
         subCatId: subCatId,
@@ -90,6 +98,9 @@ const getPaperByCategory = async (req, res) => {
         QPYear: subcatAndYear.QPYear,
         subCatName: subCategory ? subCategory.subCatName : "Unknown",
         questions: questions,
+        questionPaperName: subCategory
+          ? subCategory.questionPaperName
+          : "Unknown",
       });
     }
 

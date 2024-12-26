@@ -282,7 +282,7 @@ const getCategoriesWithSubcategoriesAndYearsAndQuestionPaper = async (
 };
 
 const createExamEntry = async (req, res) => {
-  const { categoryId, subCatName, year } = req.body;
+  const { categoryId, subCatName, year, questionPaperName } = req.body;
 
   try {
     // Validate categoryId
@@ -304,6 +304,7 @@ const createExamEntry = async (req, res) => {
       QPYear: year,
       catId: categoryId,
       subCatId: savedSubExamType._id,
+      questionPaperName,
     });
 
     const savedExamYear = await newExamYear.save();
