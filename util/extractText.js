@@ -115,8 +115,9 @@ const processImagesInDirectory = async (directoryPath, outputPath) => {
 };
 
 // Define paths
-const picFolderPath = "/home/sumit/Project/App/server/pic";
-const outputTextPath = "/home/sumit/Project/App/server/util/extractedText.txt";
+const picFolderPath = "/home/sumit/Project/App/meadhikari_sever/pic";
+const outputTextPath =
+  "/home/sumit/Project/App/meadhikari_sever/util/extractedText.txt";
 
 // Process all images in the pic folder
 processImagesInDirectory(picFolderPath, outputTextPath);

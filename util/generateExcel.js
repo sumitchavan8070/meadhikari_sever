@@ -154,8 +154,10 @@ const generateExcelFromText = (inputTextPath, outputExcelPath) => {
 };
 
 // Define file paths
-const inputTextPath = "/home/sumit/Project/App/server/util/extractedText.txt";
-const outputExcelPath = "/home/sumit/Project/App/server/util/questions.xlsx";
+const inputTextPath =
+  "/home/sumit/Project/App/meadhikari_sever/util/extractedText.txt";
+const outputExcelPath =
+  "/home/sumit/Project/App/meadhikari_sever/util/questions.xlsx";
 
 // Generate Excel from text
 generateExcelFromText(inputTextPath, outputExcelPath);
