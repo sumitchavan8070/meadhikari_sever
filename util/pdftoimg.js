@@ -42,7 +42,7 @@ const sharp = require("sharp"); // For image processing
 
 // Path to your PDF file
 const pdfPath =
-  "/home/sumit/Project/App/meadhikari_sever/QuestionPaperPdf/testmpsc2011psi.pdf";
+  "/home/sumit/Project/App/meadhikari_sever/QuestionPaperPdf/test.pdf";
 
 // Temporary directory for storing images
 const tempDir = "/home/sumit/Project/App/meadhikari_sever/pic";

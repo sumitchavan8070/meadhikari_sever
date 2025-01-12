@@ -12,56 +12,137 @@ const { comparePasswordWithoutHashing } = require("../helpers/userHelper");
 
 //register
 
+// const registerController = async (req, res) => {
+//   try {
+//     const { name, username, email, password, fcmToken } = req.body;
+//     //validation
+//     if (!name) {
+//       return res.status(400).send({
+//         success: false,
+//         message: "name is required",
+//       });
+//     }
+
+//     if (!username) {
+//       return res.status(400).send({
+//         success: false,
+//         message: "username is required",
+//       });
+//     }
+//     if (!email) {
+//       return res.status(400).send({
+//         success: false,
+//         message: "email is required",
+//       });
+//     }
+//     if (!password || password.length < 6) {
+//       return res.status(400).send({
+//         success: false,
+//         message: "password is required and 6 character long",
+//       });
+//     }
+//     //exisiting user
+//     const exisitingUsername = await userModel.findOne({ username });
+//     if (exisitingUsername) {
+//       return res.status(500).send({
+//         success: false,
+//         message: "Username is Already Taken",
+//       });
+//     }
+
+//     const exisitingEmail = await userModel.findOne({ email });
+//     if (exisitingEmail) {
+//       return res.status(500).send({
+//         success: false,
+//         message: "Email is Already Taken",
+//       });
+//     }
+
+//     // //hashed pasword
+//     // const hashedPassword = await hashPassword(password);
+
+//     // //save user
+//     const user = await userModel({
+//       name,
+//       username,
+//       email,
+//       password,
+//       fcmToken,
+//     }).save();
+
+//     return res.status(201).send({
+//       success: true,
+//       message: "Registeration Successfull Please Login",
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).send({
+//       success: false,
+//       message: "Error in Register API",
+//       error,
+//     });
+//   }
+// };
+
+const nodemailer = require("nodemailer");
+
+// Configure Nodemailer transporter (example using Gmail)
+const transporter = nodemailer.createTransport({
+  service: "gmail", // Use your email service
+  auth: {
+    user: "sdchavan8070@gmail.com", // Your email
+    pass: "Sumitc@8070", // Your email password or app-specific password
+  },
+});
+
 const registerController = async (req, res) => {
   try {
     const { name, username, email, password, fcmToken } = req.body;
-    //validation
+
+    // Validation
     if (!name) {
       return res.status(400).send({
         success: false,
-        message: "name is required",
+        message: "Name is required",
       });
     }
-
     if (!username) {
       return res.status(400).send({
         success: false,
-        message: "username is required",
+        message: "Username is required",
       });
     }
     if (!email) {
       return res.status(400).send({
         success: false,
-        message: "email is required",
+        message: "Email is required",
       });
     }
     if (!password || password.length < 6) {
       return res.status(400).send({
         success: false,
-        message: "password is required and 6 character long",
+        message: "Password is required and must be at least 6 characters long",
       });
     }
-    //exisiting user
-    const exisitingUsername = await userModel.findOne({ username });
-    if (exisitingUsername) {
-      return res.status(500).send({
+
+    // Check for existing user
+    const existingUsername = await userModel.findOne({ username });
+    if (existingUsername) {
+      return res.status(400).send({
         success: false,
-        message: "Username is Already Taken",
+        message: "Username is already taken",
       });
     }
 
-    const exisitingEmail = await userModel.findOne({ email });
-    if (exisitingEmail) {
-      return res.status(500).send({
+    const existingEmail = await userModel.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).send({
         success: false,
-        message: "Email is Already Taken",
+        message: "Email is already taken",
       });
     }
 
-    // //hashed pasword
-    // const hashedPassword = await hashPassword(password);
-
-    // //save user
+    // Save user
     const user = await userModel({
       name,
       username,
@@ -70,9 +151,36 @@ const registerController = async (req, res) => {
       fcmToken,
     }).save();
 
+    // Send registration success email
+    const mailOptions = {
+      from: "sdchavan8070@gmail.com", // Sender email
+      to: email, // User's email
+      subject: "Registration Successful", // Email subject
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h2>Welcome to Our Platform!</h2>
+          <p>Dear ${name},</p>
+          <p>Your registration was successful. Here are your login details:</p>
+          <p><strong>Username:</strong> ${username}</p>
+          <p><strong>Password:</strong> ${password}</p>
+          <p>Thank you for joining us!</p>
+          <img src="https://your-logo-url.com/logo.png" alt="Logo" style="width: 100px; height: auto;" />
+          <p>Best regards,<br/>The Team</p>
+        </div>
+      `,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log("Error sending email:", error);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
+
     return res.status(201).send({
       success: true,
-      message: "Registeration Successfull Please Login",
+      message: "Registration successful. Please check your email for details.",
     });
   } catch (error) {
     console.log(error);
@@ -83,6 +191,8 @@ const registerController = async (req, res) => {
     });
   }
 };
+
+module.exports = { registerController };
 
 const updateUserBasicInfo = async (req, res) => {
   const { userId } = req.params; // Assuming you pass the userId in the URL params
