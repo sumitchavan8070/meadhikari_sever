@@ -91,7 +91,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail", // Use your email service
   auth: {
     user: "sdchavan8070@gmail.com", // Your email
-    pass: "Sumitc@8070", // Your email password or app-specific password
+    pass: "tjos zvii hngv fhni", // Your email password or app-specific password
   },
 });
 
@@ -153,20 +153,134 @@ const registerController = async (req, res) => {
 
     // Send registration success email
     const mailOptions = {
-      from: "sdchavan8070@gmail.com", // Sender email
+      from: "contact@meadhikari.com", // Sender email
       to: email, // User's email
-      subject: "Registration Successful", // Email subject
+      subject: "Registration Successful - Meadhikari 😎", // Email subject
       html: `
-        <div style="font-family: Arial, sans-serif; color: #333;">
-          <h2>Welcome to Our Platform!</h2>
-          <p>Dear ${name},</p>
-          <p>Your registration was successful. Here are your login details:</p>
-          <p><strong>Username:</strong> ${username}</p>
-          <p><strong>Password:</strong> ${password}</p>
-          <p>Thank you for joining us!</p>
-          <img src="https://your-logo-url.com/logo.png" alt="Logo" style="width: 100px; height: auto;" />
-          <p>Best regards,<br/>The Team</p>
+       <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Responsive Styles */
+    @media only screen and (max-width: 600px) {
+      .header h1 {
+        font-size: 20px !important;
+      }
+      .stats td {
+        display: block;
+        width: 100% !important;
+        padding: 10px 0 !important;
+      }
+      .social-icons img {
+        width: 30px !important;
+        height: 30px !important;
+      }
+    }
+  </style>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+  <!-- Header with Black Gradient -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #000000, #333333); padding: 20px 0; text-align: center;">
+    <tr>
+      <td>
+        <img src="https://res.cloudinary.com/sdchavan/image/upload/v1730219215/xqhqdzggmwwdn2ws63eq.png" alt="Meadhikari Logo" style="width: 200px; height: auto;">
+        <h1 class="header" style="color: #ffffff; margin: 10px 0 0; font-size: 24px;">Welcome to Meadhikari!</h1>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Main Content -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <tr>
+      <td style="padding: 20px;">
+        <h2 style="color: #333333; font-size: 20px; margin-bottom: 20px;">Dear ${name},</h2>
+        <p style="color: #555555; font-size: 16px; line-height: 1.6;">
+          Your registration with <strong>Meadhikari</strong> was successful! Welcome to the ultimate platform for Maharashtra public service exams like MPSC, Talathi, Police Bharti, Gramsevak, Krushi Sevak, Arogya Bharti, and many more.
+        </p>
+        
+        <!-- Login Details -->
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <p style="color: #333333; font-size: 16px; margin: 0;"><strong>Username:</strong> ${email}</p>
+          <p style="color: #333333; font-size: 16px; margin: 10px 0 0;"><strong>Password:</strong> ${password}</p>
         </div>
+
+        <p style="color: #555555; font-size: 16px; line-height: 1.6;">
+          At Meadhikari, we provide you with the tools and resources you need to ace your exams. With access to <strong>2000+ Previous Year Question Papers</strong>, comprehensive study materials, and expert guidance, you’re now one step closer to achieving your dreams.
+        </p>
+
+        <!-- Stats Section -->
+        <table class="stats" width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0; text-align: center; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">
+              <h3 style="color: #007BFF; font-size: 24px; margin: 0;">2000+</h3>
+              <p style="color: #555555; font-size: 16px; margin: 5px 0;">Previous Year Question Papers</p>
+            </td>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">
+              <h3 style="color: #007BFF; font-size: 24px; margin: 0;">7k+</h3>
+              <p style="color: #555555; font-size: 16px; margin: 5px 0;">Daily Active Users</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">
+              <h3 style="color: #007BFF; font-size: 24px; margin: 0;">75+</h3>
+              <p style="color: #555555; font-size: 16px; margin: 5px 0;">Exams Covered</p>
+            </td>
+            <td style="padding: 10px; border: 1px solid #e0e0e0;">
+              <h3 style="color: #007BFF; font-size: 24px; margin: 0;">55k+</h3>
+              <p style="color: #555555; font-size: 16px; margin: 5px 0;">Registered Users</p>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Call to Action with Gradient -->
+        <p style="color: #555555; font-size: 16px; line-height: 1.6;">Download our app on the <strong>Google Play Store</strong> to access all features on the go:</p>
+        <a href="https://play.google.com/store/apps/details?id=com.sc.meadhikari" style="display: inline-block; background: linear-gradient(135deg, #007BFF, #00BFFF); color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 10px 0; transition: background 0.3s ease;">Download Meadhikari App</a>
+
+        <!-- Social Media Links -->
+        <p style="color: #555555; font-size: 16px; line-height: 1.6; margin-top: 20px;">Follow us on:</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="text-align: center; margin: 10px 0;">
+          <tr>
+            <td style="padding: 10px;">
+              <a href="https://play.google.com/store/apps/details?id=com.sc.meadhikari" style="text-decoration: none;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Play Store" style="width: 120px; height: auto; transition: transform 0.3s ease;">
+              </a>
+            </td>
+            <td style="padding: 10px;">
+              <a href="https://www.youtube.com/@meadhikariacademy" style="text-decoration: none;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YouTube" style="width: 40px; height: auto; transition: transform 0.3s ease;">
+              </a>
+            </td>
+            <td style="padding: 10px;">
+              <a href="https://instagram.com/meadhikari" style="text-decoration: none;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram" style="width: 40px; height: auto; transition: transform 0.3s ease;">
+              </a>
+            </td>
+          </tr>
+        </table>
+
+        <p style="color: #555555; font-size: 16px; line-height: 1.6;">Visit our website for more details: <a href="https://meadhikari.com" style="color: #007BFF; text-decoration: none;">www.meadhikari.com</a></p>
+
+        <p style="color: #555555; font-size: 16px; line-height: 1.6;">Thank you for choosing Meadhikari. We're excited to be part of your journey towards success!</p>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Footer -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #333333; padding: 20px 0; text-align: center;">
+    <tr>
+      <td>
+        <p style="color: #ffffff; font-size: 14px; margin: 0;">&copy; 2025 Meadhikari. All rights reserved.</p>
+        <p style="color: #ffffff; font-size: 14px; margin: 10px 0 0;">
+          <a href="https://meadhikari.com/privacy-policy" style="color: #ffffff; text-decoration: none;">Privacy Policy</a>
+         
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
       `,
     };
 
