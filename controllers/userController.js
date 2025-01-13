@@ -105,79 +105,136 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const resetPasswordController = async (req, res) => {
-  const { token, password } = req.body; // Extract token and password from request body
+// const resetPasswordController = async (req, res) => {
+//   const { token, password } = req.body; // Extract token and password from request body
+//   console.log("Token:", token);
+//   console.log("Password:", password);
 
-  try {
-    // Validate token and password
-    if (!token || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Token and password are required.",
-      });
-    }
+//   try {
+//     // Validate token and password
+//     if (!token || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Token and password are required.",
+//       });
+//     }
 
-    // Hash the token
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+//     // Hash the token
+//     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+//     console.log("Hashed Token:", hashedToken);
 
-    // Find the user by the hashed token and check if the token is still valid
-    const user = await userModel.findOne({
-      resetPasswordToken: hashedToken,
-      resetPasswordExpire: { $gt: Date.now() }, // Check if the token is still valid
-    });
+//     // Find the user by the hashed token and check if the token is still valid
+//     const query = {
+//       resetPasswordToken: hashedToken,
+//       resetPasswordExpire: { $gt: Date.now() }, // Check if the token is still valid
+//     };
+//     console.log("Query:", query);
 
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid or expired token.",
-      });
-    }
+//     const user = await userModel.findOne(query);
+//     console.log("User:", user);
 
-    // console.log("userbefore===", user);
+//     if (!user) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid or expired token.",
+//       });
+//     }
 
-    // Update the user's password and clear the reset token fields
-    user.password = password;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-    await user.save();
+//     // Update the user's password and clear the reset token fields
+//     user.password = password;
+//     user.resetPasswordToken = undefined;
+//     user.resetPasswordExpire = undefined;
+//     await user.save();
 
-    // console.log("userafter===", user);
+//     // Respond with success
+//     res.status(200).json({
+//       success: true,
+//       message: "Password reset successful.",
+//     });
+//   } catch (error) {
+//     console.error("Error in resetPasswordController:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Internal server error.",
+//     });
+//   }
+// };
 
-    // Respond with success
-    res.status(200).json({
-      success: true,
-      message: "Password reset successful.",
-    });
-  } catch (error) {
-    console.error("Error in resetPasswordController:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error.",
-    });
-  }
-};
+// const forgotPasswordController = async (req, res) => {
+//   const { email } = req.body;
+
+//   try {
+//     // Check if the email exists in the database
+//     const user = await userModel.findOne({ email });
+
+//     if (!user) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Email not found." });
+//     }
+
+//     // Generate a password reset token
+//     const resetToken = crypto.randomBytes(20).toString("hex");
+
+//     // Save the token and expiration time to the user document
+//     user.resetPasswordToken = crypto
+//       .createHash("sha256")
+//       .update(resetToken)
+//       .digest("hex");
+//     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // Token expires in 10 minutes
+//     await user.save();
+
+//     // Send the password reset email
+//     const resetUrl = `http://www.meadhikari.com/reset-password/${resetToken}`;
+//     const message = `
+//       <h1>You have requested a password reset</h1>
+//       <p>Please click the link below to reset your password:</p>
+//       <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+//       <p>This link will expire in 10 minutes.</p>
+//     `;
+
+//     await sendEmail({
+//       to: user.email,
+//       subject: "Password Reset Request",
+//       text: `Please click the link to reset your password: ${resetUrl}`,
+//       html: message,
+//     });
+
+//     res
+//       .status(200)
+//       .json({ success: true, message: "Password reset email sent." });
+//   } catch (error) {
+//     console.error("Error in forgotPasswordController:", error);
+//     res.status(500).json({ success: false, message: "Internal server error." });
+//   }
+// };
 
 const forgotPasswordController = async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Check if the email exists in the database
+    // Find the user by email
     const user = await userModel.findOne({ email });
 
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Email not found." });
+      return res.status(404).json({
+        success: false,
+        message: "Email not found.",
+      });
     }
 
-    // Generate a password reset token
+    // Generate a reset token
     const resetToken = crypto.randomBytes(20).toString("hex");
-
-    // Save the token and expiration time to the user document
-    user.resetPasswordToken = crypto
+    const hashedToken = crypto
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
+
+    console.log("Reset Token:", resetToken);
+    console.log("Hashed Token (Forgot Password):", hashedToken);
+
+    // Save the hashed token and expiration time to the user document
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // Token expires in 10 minutes
     await user.save();
 
@@ -197,14 +254,73 @@ const forgotPasswordController = async (req, res) => {
       html: message,
     });
 
-    res
-      .status(200)
-      .json({ success: true, message: "Password reset email sent." });
+    res.status(200).json({
+      success: true,
+      message: "Password reset email sent.",
+    });
   } catch (error) {
     console.error("Error in forgotPasswordController:", error);
-    res.status(500).json({ success: false, message: "Internal server error." });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
   }
 };
+
+const resetPasswordController = async (req, res) => {
+  const { token, password } = req.body; // Extract token and password from request body
+  console.log("Token (Reset Password):", token);
+
+  try {
+    // Validate token and password
+    if (!token || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Token and password are required.",
+      });
+    }
+
+    // Hash the token
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    console.log("Hashed Token (Reset Password):", hashedToken);
+
+    // Find the user by the hashed token and check if the token is still valid
+    const query = {
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() }, // Check if the token is still valid
+    };
+    console.log("Query:", query);
+
+    const user = await userModel.findOne(query);
+    console.log("User:", user);
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired token.",
+      });
+    }
+
+    // Update the user's password and clear the reset token fields
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    // Respond with success
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful.",
+    });
+  } catch (error) {
+    console.error("Error in resetPasswordController:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};
+
 const registerController = async (req, res) => {
   try {
     const { name, username, email, password, fcmToken } = req.body;
