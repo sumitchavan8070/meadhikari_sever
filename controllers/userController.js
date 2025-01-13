@@ -87,6 +87,7 @@ const crypto = require("crypto"); // For generating a secure token
 // };
 
 const nodemailer = require("nodemailer");
+const { log } = require("console");
 
 // Configure Nodemailer transporter (example using Gmail)
 // const transporter = nodemailer.createTransport({
@@ -105,23 +106,34 @@ const transporter = nodemailer.createTransport({
 });
 
 const resetPasswordController = async (req, res) => {
-  const { token } = req.params;
-  const { password } = req.body;
+  const { token, password } = req.body; // Extract token and password from request body
 
   try {
-    // Hash the token and find the user
+    // Validate token and password
+    if (!token || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Token and password are required.",
+      });
+    }
+
+    // Hash the token
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
+    // Find the user by the hashed token and check if the token is still valid
     const user = await userModel.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordExpire: { $gt: Date.now() }, // Check if the token is still valid
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid or expired token." });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired token.",
+      });
     }
+
+    // console.log("userbefore===", user);
 
     // Update the user's password and clear the reset token fields
     user.password = password;
@@ -129,12 +141,19 @@ const resetPasswordController = async (req, res) => {
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "Password reset successful." });
+    // console.log("userafter===", user);
+
+    // Respond with success
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful.",
+    });
   } catch (error) {
     console.error("Error in resetPasswordController:", error);
-    res.status(500).json({ success: false, message: "Internal server error." });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
   }
 };
 
