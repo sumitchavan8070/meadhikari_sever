@@ -348,7 +348,7 @@ const forgotPasswordController = async (req, res) => {
     // Send the password reset email
     await sendEmail({
       to: user.email,
-      subject: "Password Reset Request - Meadhikari",
+      subject: "Password Reset Request - Meadhikari 🔒",
       text: `Please click the link to reset your password: ${resetUrl}`,
       html: emailTemplate,
     });
