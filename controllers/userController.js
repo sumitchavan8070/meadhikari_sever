@@ -3,6 +3,8 @@ const userModel = require("../models/userModel");
 const JWT = require("jsonwebtoken");
 const GlobalPlan = require("../models/GlobalPlan");
 const { comparePasswordWithoutHashing } = require("../helpers/userHelper");
+const sendEmail = require("../util/sendEmail");
+const crypto = require("crypto"); // For generating a secure token
 
 // //middleware
 // const requireSingIn = jwt({
@@ -87,14 +89,103 @@ const { comparePasswordWithoutHashing } = require("../helpers/userHelper");
 const nodemailer = require("nodemailer");
 
 // Configure Nodemailer transporter (example using Gmail)
+// const transporter = nodemailer.createTransport({
+//   service: "gmail", // Use your email service
+//   auth: {
+//     user: "sdchavan8070@gmail.com", // Your email
+//     pass: "tjos zvii hngv fhni", // Your email password or app-specific password
+//   },
+// });
 const transporter = nodemailer.createTransport({
   service: "gmail", // Use your email service
   auth: {
-    user: "sdchavan8070@gmail.com", // Your email
-    pass: "tjos zvii hngv fhni", // Your email password or app-specific password
+    user: process.env.EMAIL_USER, // Your email address
+    pass: process.env.EMAIL_PASSWORD, // Your email password or app-specific password
   },
 });
 
+const resetPasswordController = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    // Hash the token and find the user
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await userModel.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() }, // Check if the token is still valid
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired token." });
+    }
+
+    // Update the user's password and clear the reset token fields
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successful." });
+  } catch (error) {
+    console.error("Error in resetPasswordController:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
+
+const forgotPasswordController = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Check if the email exists in the database
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Email not found." });
+    }
+
+    // Generate a password reset token
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    // Save the token and expiration time to the user document
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // Token expires in 10 minutes
+    await user.save();
+
+    // Send the password reset email
+    const resetUrl = `http://www.meadhikari.com/reset-password/${resetToken}`;
+    const message = `
+      <h1>You have requested a password reset</h1>
+      <p>Please click the link below to reset your password:</p>
+      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+      <p>This link will expire in 10 minutes.</p>
+    `;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset Request",
+      text: `Please click the link to reset your password: ${resetUrl}`,
+      html: message,
+    });
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset email sent." });
+  } catch (error) {
+    console.error("Error in forgotPasswordController:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+};
 const registerController = async (req, res) => {
   try {
     const { name, username, email, password, fcmToken } = req.body;
@@ -305,8 +396,6 @@ const registerController = async (req, res) => {
     });
   }
 };
-
-module.exports = { registerController };
 
 const updateUserBasicInfo = async (req, res) => {
   const { userId } = req.params; // Assuming you pass the userId in the URL params
@@ -914,4 +1003,6 @@ module.exports = {
   updateProfilePicture,
   updateUserSubscription,
   updateUserMobileNumber,
+  resetPasswordController,
+  forgotPasswordController,
 };

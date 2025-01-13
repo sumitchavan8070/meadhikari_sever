@@ -100,6 +100,8 @@ const userSchema = new mongoose.Schema(
     deviceOS: {
       type: String,
     },
+    resetPasswordToken: String, // Stores the hashed reset token
+    resetPasswordExpire: Date, // Stores the token expiration time
   },
   { timestamps: true }
 );

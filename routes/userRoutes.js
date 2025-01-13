@@ -8,6 +8,8 @@ const {
   updateProfilePicture,
   updateUserSubscription,
   updateUserMobileNumber,
+  resetPasswordController,
+  forgotPasswordController,
 } = require("../controllers/userController");
 const {
   createExamCat,
@@ -124,5 +126,8 @@ router.get("/:id", getUserById);
 router.put("/:userId/updateMobile", updateUserMobileNumber);
 
 router.post("/app-update", appUpdate);
+
+router.post("/reset-password", resetPasswordController);
+router.post("/forgot-password", forgotPasswordController);
 
 module.exports = router;
