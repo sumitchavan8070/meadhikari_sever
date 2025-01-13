@@ -29,6 +29,54 @@ const User = require("../models/userModel");
 //   }
 // };
 
+// exports.checkSubscription = async (req, res) => {
+//   try {
+//     const userId = req.params.userId; // Extract userId from the request parameters
+//     const user = await User.findById(userId); // Find the user by ID
+
+//     // Check if the user exists
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     const currentDate = new Date(); // Get the current date
+//     console.log("user in check --------------->", user);
+
+//     // Check if the subscription has expired
+//     if (user.subscriptionExpiryDate < currentDate) {
+//       // user.isSubscriptionActive = false; // Mark subscription as inactive
+//       // await user.save(); // Save the updated user document
+//       // const student = await User.findById(userId);
+//       if (!user) {
+//         return res.status(404).json({ message: "Student not found" });
+//       }
+
+//       console.log(
+//         "--------------------------------------------------------------------------"
+//       );
+
+//       user.testsTaken = 0;
+
+//       user.disableSubscription();
+
+//       await user.save();
+//     }
+
+//     console.log("user in check ", user);
+
+//     // Respond with the user's subscription status and expiry date
+//     return res.status(200).json({
+//       isSubscriptionActive: user.isSubscriptionActive,
+//       subscriptionExpiryDate: user.subscriptionExpiryDate,
+//       maxTestsAllowed: user.maxTestsAllowed,
+//       testsTaken: user.testsTaken,
+//     });
+//   } catch (error) {
+//     console.error("Error checking subscription:", error); // Log the error for debugging
+//     return res.status(500).json({ error: "Server error" }); // Send a generic error response
+//   }
+// };
+
 exports.checkSubscription = async (req, res) => {
   try {
     const userId = req.params.userId; // Extract userId from the request parameters
@@ -40,20 +88,20 @@ exports.checkSubscription = async (req, res) => {
     }
 
     const currentDate = new Date(); // Get the current date
+    // console.log("user in check --------------->", user);
 
     // Check if the subscription has expired
-    if (user.subscriptionExpiryDate < currentDate) {
-      // user.isSubscriptionActive = false; // Mark subscription as inactive
-      // await user.save(); // Save the updated user document
-      // const student = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "Student not found" });
-      }
+    if (
+      user.isSubscriptionActive && // Only check if the subscription is active
+      user.subscriptionExpiryDate && // Ensure subscriptionExpiryDate is not null
+      user.subscriptionExpiryDate < currentDate // Check if the subscription has expired
+    ) {
+      // console.log(
+      //   "--------------------------------------------------------------------------"
+      // );
 
-      user.testsTaken = 0;
-
+      // Disable the subscription and reset testsTaken
       user.disableSubscription();
-
       await user.save();
     }
 
@@ -116,8 +164,6 @@ exports.checkSubscriptionThroughApp = async (req, res) => {
   }
 };
 
-// Import the User model
-
 exports.updateTestsCompleted = async (req, res) => {
   const { userId } = req.body; // Extract user ID from request body
 
@@ -157,7 +203,7 @@ exports.updateTestsCompleted = async (req, res) => {
 
 exports.updateHistoryViewed = async (req, res) => {
   const { userId } = req.body; // Extract user ID from request body
-  console.log("------------------------", userId);
+  // console.log("------------------------", userId);
 
   try {
     // Find the user by ID

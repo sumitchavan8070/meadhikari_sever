@@ -100,6 +100,9 @@ const userSchema = new mongoose.Schema(
     deviceOS: {
       type: String,
     },
+    couponCode: {
+      type: String,
+    },
     resetPasswordToken: String, // Stores the hashed reset token
     resetPasswordExpire: Date, // Stores the token expiration time
   },
@@ -130,6 +133,7 @@ userSchema.methods.disableSubscription = function () {
   // this.subscriptionExpiryDate = null;
   this.testsTaken = 0;
   this.historyViewCount = 0;
+  this.couponCode = null;
 };
 
 module.exports = mongoose.model("User", userSchema);

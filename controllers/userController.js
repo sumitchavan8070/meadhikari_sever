@@ -1183,7 +1183,7 @@ const checkSubscriptionStatus = async (userId) => {
 const updateUserSubscription = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { newPlanId, purchasePaymentId } = req.body;
+    const { newPlanId, purchasePaymentId, couponCode } = req.body;
 
     // Validate newPlanId
     if (!newPlanId) {
@@ -1215,9 +1215,11 @@ const updateUserSubscription = async (req, res) => {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + planDurationInDays);
     user.subscriptionExpiryDate = expiryDate;
-
+    user.couponCode = couponCode;
     // Save the updated user details
     await user.save();
+
+    // console.log("--------------", user);
 
     // Return updated subscription details in the response
     res.status(200).json({
