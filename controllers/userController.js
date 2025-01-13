@@ -5,6 +5,7 @@ const GlobalPlan = require("../models/GlobalPlan");
 const { comparePasswordWithoutHashing } = require("../helpers/userHelper");
 const sendEmail = require("../util/sendEmail");
 const crypto = require("crypto"); // For generating a secure token
+const nodemailer = require("nodemailer");
 
 // //middleware
 // const requireSingIn = jwt({
@@ -86,9 +87,6 @@ const crypto = require("crypto"); // For generating a secure token
 //   }
 // };
 
-const nodemailer = require("nodemailer");
-const { log } = require("console");
-
 // Configure Nodemailer transporter (example using Gmail)
 // const transporter = nodemailer.createTransport({
 //   service: "gmail", // Use your email service
@@ -105,82 +103,32 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// const resetPasswordController = async (req, res) => {
-//   const { token, password } = req.body; // Extract token and password from request body
-//   console.log("Token:", token);
-//   console.log("Password:", password);
-
-//   try {
-//     // Validate token and password
-//     if (!token || !password) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Token and password are required.",
-//       });
-//     }
-
-//     // Hash the token
-//     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-//     console.log("Hashed Token:", hashedToken);
-
-//     // Find the user by the hashed token and check if the token is still valid
-//     const query = {
-//       resetPasswordToken: hashedToken,
-//       resetPasswordExpire: { $gt: Date.now() }, // Check if the token is still valid
-//     };
-//     console.log("Query:", query);
-
-//     const user = await userModel.findOne(query);
-//     console.log("User:", user);
-
-//     if (!user) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Invalid or expired token.",
-//       });
-//     }
-
-//     // Update the user's password and clear the reset token fields
-//     user.password = password;
-//     user.resetPasswordToken = undefined;
-//     user.resetPasswordExpire = undefined;
-//     await user.save();
-
-//     // Respond with success
-//     res.status(200).json({
-//       success: true,
-//       message: "Password reset successful.",
-//     });
-//   } catch (error) {
-//     console.error("Error in resetPasswordController:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Internal server error.",
-//     });
-//   }
-// };
-
 // const forgotPasswordController = async (req, res) => {
 //   const { email } = req.body;
 
 //   try {
-//     // Check if the email exists in the database
+//     // Find the user by email
 //     const user = await userModel.findOne({ email });
 
 //     if (!user) {
-//       return res
-//         .status(404)
-//         .json({ success: false, message: "Email not found." });
+//       return res.status(404).json({
+//         success: false,
+//         message: "Email not found.",
+//       });
 //     }
 
-//     // Generate a password reset token
+//     // Generate a reset token
 //     const resetToken = crypto.randomBytes(20).toString("hex");
-
-//     // Save the token and expiration time to the user document
-//     user.resetPasswordToken = crypto
+//     const hashedToken = crypto
 //       .createHash("sha256")
 //       .update(resetToken)
 //       .digest("hex");
+
+//     // console.log("Reset Token:", resetToken);
+//     // console.log("Hashed Token (Forgot Password):", hashedToken);
+
+//     // Save the hashed token and expiration time to the user document
+//     user.resetPasswordToken = hashedToken;
 //     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // Token expires in 10 minutes
 //     await user.save();
 
@@ -200,17 +148,29 @@ const transporter = nodemailer.createTransport({
 //       html: message,
 //     });
 
-//     res
-//       .status(200)
-//       .json({ success: true, message: "Password reset email sent." });
+//     res.status(200).json({
+//       success: true,
+//       message: "Password reset email sent.",
+//     });
 //   } catch (error) {
 //     console.error("Error in forgotPasswordController:", error);
-//     res.status(500).json({ success: false, message: "Internal server error." });
+//     res.status(500).json({
+//       success: false,
+//       message: "Internal server error.",
+//     });
 //   }
 // };
 
 const forgotPasswordController = async (req, res) => {
   const { email } = req.body;
+
+  // Validate email
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      message: "Email is required.",
+    });
+  }
 
   try {
     // Find the user by email
@@ -219,7 +179,8 @@ const forgotPasswordController = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Email not found.",
+        message:
+          "If the email is registered, you will receive a password reset link.",
       });
     }
 
@@ -230,46 +191,83 @@ const forgotPasswordController = async (req, res) => {
       .update(resetToken)
       .digest("hex");
 
-    console.log("Reset Token:", resetToken);
-    console.log("Hashed Token (Forgot Password):", hashedToken);
-
     // Save the hashed token and expiration time to the user document
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // Token expires in 10 minutes
     await user.save();
 
-    // Send the password reset email
-    const resetUrl = `http://www.meadhikari.com/reset-password/${resetToken}`;
-    const message = `
-      <h1>You have requested a password reset</h1>
-      <p>Please click the link below to reset your password:</p>
-      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
-      <p>This link will expire in 10 minutes.</p>
+    // Construct the reset URL
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    // Customized email template for your business
+    const emailTemplate = `
+      <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4A90E2; text-align: center;">Password Reset Request</h1>
+        <p style="font-size: 16px;">Hello ${user.name || "User"},</p>
+        <p style="font-size: 16px;">
+          We received a request to reset your password for your <strong>Meadhikari</strong> account. If you did not make this request, please ignore this email.
+        </p>
+        <p style="font-size: 16px;">
+          To reset your password, click the button below:
+        </p>
+        <div style="text-align: center; margin: 20px 0;">
+          <a href="${resetUrl}" style="background-color: #4A90E2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-size: 16px;">
+            Reset Password
+          </a>
+        </div>
+        <p style="font-size: 16px;">
+          If the button above doesn't work, copy and paste the following link into your browser:
+        </p>
+        <p style="font-size: 16px; word-break: break-all;">
+          <a href="${resetUrl}" style="color: #4A90E2;">${resetUrl}</a>
+        </p>
+        <p style="font-size: 16px;">
+          This link will expire in <strong>10 minutes</strong>. If you don't reset your password within this time, you'll need to request another reset.
+        </p>
+        <p style="font-size: 16px;">
+          Thank you,<br />
+          The <strong>Meadhikari</strong> Team
+        </p>
+        <p style="font-size: 14px; color: #777; text-align: center;">
+          &copy; ${new Date().getFullYear()} Meadhikari. All rights reserved.
+        </p>
+      </div>
     `;
 
+    // Send the password reset email
     await sendEmail({
       to: user.email,
-      subject: "Password Reset Request",
+      subject: "Password Reset Request - Meadhikari",
       text: `Please click the link to reset your password: ${resetUrl}`,
-      html: message,
+      html: emailTemplate,
     });
 
+    // Log success (for debugging purposes)
+    console.log(`Password reset email sent to: ${user.email}`);
+
+    // Respond with success
     res.status(200).json({
       success: true,
-      message: "Password reset email sent.",
+      message: "Password reset email sent. Please check your inbox.",
     });
   } catch (error) {
     console.error("Error in forgotPasswordController:", error);
+
+    // Log the error for debugging
+    console.error(`Error details: ${error.message}`);
+
+    // Respond with a generic error message
     res.status(500).json({
       success: false,
-      message: "Internal server error.",
+      message:
+        "An error occurred while processing your request. Please try again later.",
     });
   }
 };
 
 const resetPasswordController = async (req, res) => {
   const { token, password } = req.body; // Extract token and password from request body
-  console.log("Token (Reset Password):", token);
+  // console.log("Token (Reset Password):", token);
 
   try {
     // Validate token and password
@@ -282,17 +280,17 @@ const resetPasswordController = async (req, res) => {
 
     // Hash the token
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-    console.log("Hashed Token (Reset Password):", hashedToken);
+    // console.log("Hashed Token (Reset Password):", hashedToken);
 
     // Find the user by the hashed token and check if the token is still valid
     const query = {
       resetPasswordToken: hashedToken,
       resetPasswordExpire: { $gt: Date.now() }, // Check if the token is still valid
     };
-    console.log("Query:", query);
+    // console.log("Query:", query);
 
     const user = await userModel.findOne(query);
-    console.log("User:", user);
+    // console.log("User:", user);
 
     if (!user) {
       return res.status(400).json({
