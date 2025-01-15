@@ -111,4 +111,71 @@ const getPaperByCategory = async (req, res) => {
   }
 };
 
-module.exports = { createPaper, getAllPapers, getPaperByCategory };
+const getPaperByCategoryForWeb = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    // Fetch subcategories and years
+    const subcatAndYears = await ExamYear.find({ catId: categoryId });
+
+    // Initialize an array to store paper metadata
+    const papersMetadata = [];
+
+    // Iterate through each subcategory and year combination
+    for (const subcatAndYear of subcatAndYears) {
+      const { subCatId, _id: yearId, QPYear } = subcatAndYear;
+
+      const subCategory = await SubExamType.findById(subCatId);
+
+      // Fetch questions for the current subcategory and year combination
+      const questions = await QuestionPaper.find({
+        subCatID: subCatId,
+        QPYearID: yearId,
+      });
+
+      // Push paper metadata (without questions) to the array
+      papersMetadata.push({
+        catID: categoryId,
+        subCatId: subCatId,
+        yearId: yearId,
+        QPYear: QPYear,
+        subCatName: subCategory ? subCategory.subCatName : "Unknown",
+        questionPaperName: subCategory
+          ? subCategory.questionPaperName
+          : "Unknown",
+        questionsLength: questions.length, // Include the length of the questions array
+      });
+    }
+
+    res.json(papersMetadata);
+  } catch (error) {
+    console.error("Error fetching paper metadata:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getQuestionsForPaper = async (req, res) => {
+  try {
+    const { categoryId, subcatId, yearId } = req.params;
+
+    // Fetch questions for the specified paper
+    const questions = await QuestionPaper.find({
+      catID: categoryId,
+      subCatID: subcatId,
+      QPYearID: yearId,
+    });
+
+    res.json({ questions });
+  } catch (error) {
+    console.error("Error fetching questions:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  createPaper,
+  getAllPapers,
+  getPaperByCategory,
+  getPaperByCategoryForWeb,
+  getQuestionsForPaper,
+};
