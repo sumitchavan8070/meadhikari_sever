@@ -44,9 +44,6 @@ app.use(morgan("dev"));
 // defalut route
 
 app.get("/", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://www.meadhikari.com");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.status(200).json({
     success: true,
     message: "Welcome to MeAdhikari.",
