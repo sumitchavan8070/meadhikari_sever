@@ -146,6 +146,14 @@ const getPaperByCategoryForWeb = async (req, res) => {
         questionsLength: questions.length, // Include the length of the questions array
       });
     }
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cache-Control", "public, max-age=3600");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, OPTIONS, PUT, DELETE"
+    );
+
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     res.json(papersMetadata);
   } catch (error) {
@@ -164,7 +172,14 @@ const getQuestionsForPaper = async (req, res) => {
       subCatID: subcatId,
       QPYearID: yearId,
     });
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Cache-Control", "public, max-age=3600");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, OPTIONS, PUT, DELETE"
+    );
 
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.json({ questions });
   } catch (error) {
     console.error("Error fetching questions:", error);
