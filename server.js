@@ -32,11 +32,38 @@ connectDB();
 //Rest Object
 
 //middleware
+// app.use(
+//   cors({
+//     origin: "*",
+//   })
+// );
+
+// Allow only specific origins
+const allowedOrigins = ["https://www.meadhikari.com"];
+
+// CORS configuration
 app.use(
   cors({
-    origin: "*",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g., mobile apps, Postman)
+      if (!origin) return callback(null, true);
+
+      // Check if the origin is in the allowed list
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: "GET,POST,PUT,DELETE,OPTIONS", // Allowed HTTP methods
+    allowedHeaders: "Content-Type,Authorization", // Allowed headers
+    credentials: true, // Allow credentials (cookies, authorization headers)
   })
 );
+
+// Handle preflight requests explicitly
+app.options("*", cors()); // Allow preflight requests for all routes
+
 app.use(express.json());
 app.use(morgan("dev"));
 
