@@ -10,6 +10,7 @@ const {
   updateUserMobileNumber,
   resetPasswordController,
   forgotPasswordController,
+  sendContactEmail,
 } = require("../controllers/userController");
 const {
   createExamCat,
@@ -129,5 +130,7 @@ router.post("/app-update", appUpdate);
 
 router.post("/reset-password", resetPasswordController);
 router.post("/forgot-password", forgotPasswordController);
+
+router.post("/contactus", sendContactEmail);
 
 module.exports = router;

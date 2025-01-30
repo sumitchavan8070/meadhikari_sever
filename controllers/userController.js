@@ -6,6 +6,7 @@ const { comparePasswordWithoutHashing } = require("../helpers/userHelper");
 const sendEmail = require("../util/sendEmail");
 const crypto = require("crypto"); // For generating a secure token
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 // //middleware
 // const requireSingIn = jwt({
@@ -641,6 +642,60 @@ const registerController = async (req, res) => {
   }
 };
 
+const sendContactEmail = async (req, res) => {
+  const { fullName, phone, city, message } = req.body;
+
+  if (!fullName || !phone || !city || !message) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    // Log environment variables (for debugging)
+    console.log("Sending contact email...");
+    console.log("SMTP User:", process.env.EMAIL_USER);
+    console.log(
+      "SMTP Pass:",
+      process.env.EMAIL_PASSWORD ? "Exists" : "Missing"
+    );
+
+    // Create transporter using SMTP settings
+    let transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465, // Use 587 with secure: false if needed
+      secure: true, // true for port 465, false for 587
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    // Email options
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: "contact@meadhikari.com",
+      subject: "New Contact Form Submission",
+      text: `You have a new message from:
+
+      Name: ${fullName}
+      Phone: ${phone}
+      City: ${city}
+      Message: ${message}`,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+    console.log("Contact email sent successfully!");
+
+    res.status(200).json({ message: "Email sent successfully" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+
+    res.status(500).json({
+      error: "Failed to send email. Please check server logs for details.",
+    });
+  }
+};
+
 const updateUserBasicInfo = async (req, res) => {
   const { userId } = req.params; // Assuming you pass the userId in the URL params
   const { name, username, email, location, mobileNumber } = req.body;
@@ -1251,4 +1306,5 @@ module.exports = {
   updateUserMobileNumber,
   resetPasswordController,
   forgotPasswordController,
+  sendContactEmail,
 };
