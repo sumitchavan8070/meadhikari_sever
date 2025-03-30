@@ -433,7 +433,8 @@ const resetPasswordController = async (req, res) => {
 
 const registerController = async (req, res) => {
   try {
-    const { name, username, email, password, fcmToken } = req.body;
+    const { name, username, email, password, fcmToken, mobileNumber } =
+      req.body;
 
     // Validation
     if (!name) {
@@ -485,6 +486,7 @@ const registerController = async (req, res) => {
       email,
       password,
       fcmToken,
+      mobileNumber,
     }).save();
 
     // Send registration success email
