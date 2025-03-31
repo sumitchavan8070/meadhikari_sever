@@ -103,6 +103,10 @@ const userSchema = new mongoose.Schema(
     couponCode: {
       type: String,
     },
+    registeredThrough: {
+      type: String,
+      default: null, // Default to null if not provided
+    },
     resetPasswordToken: String, // Stores the hashed reset token
     resetPasswordExpire: Date, // Stores the token expiration time
   },
